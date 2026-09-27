@@ -3,10 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db   = 'ebook_store';
+$host = 'sql308.infinityfree.com';
+$user = 'if0_43025814';
+$pass = 'ebookstore007x';
+$db   = 'if0_43025814_ebook_store';
 
 $conn = new mysqli($host, $user, $pass, $db);
 
