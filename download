@@ -1,0 +1,44 @@
+<?php
+session_start();
+require_once 'config/db.php'; // ไฟล์เชื่อมต่อฐานข้อมูล PDO
+
+// 1. ตรวจสอบการล็อกอิน
+if (!isset($_SESSION['user_id'])) {
+    die("กรุณาเข้าสู่ระบบก่อนใช้งาน");
+}
+
+$current_user_id = $_SESSION['user_id'];
+$ebook_id = $_GET['ebook_id'] ?? null;
+
+if (!$ebook_id) {
+    die("ไม่พบรายการหนังสือที่ระบุ");
+}
+
+// 2. Query เช็คว่าผู้ใช้นี้ เคยซื้อ E-Book เล่มนี้ และคำสั่งซื้อมีสถานะเป็น 'confirmed' แล้วหรือไม่
+$sql = "SELECT e.download_url, e.title 
+        FROM orders o
+        JOIN order_items oi ON o.order_id = oi.order_id
+        JOIN ebooks e ON oi.ebook_id = e.ebook_id
+        WHERE o.user_id = :user_id 
+          AND oi.ebook_id = :ebook_id 
+          AND o.status = 'confirmed'";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute([
+    'user_id' => $current_user_id,
+    'ebook_id' => $ebook_id
+]);
+
+$ebook = $stmt->fetch();
+
+// 3. ตรวจสอบเงื่อนไขสิทธิ์การเข้าถึง
+if ($ebook) {
+    // สิทธิ์ถูกต้อง: แสดงลิงก์ดาวน์โหลด
+    echo "<h1>ดาวน์โหลด E-Book: " . htmlspecialchars($ebook['title']) . "</h1>";
+    echo "<a href='" . htmlspecialchars($ebook['download_url']) . "' class='btn' target='_blank'>คลิกที่นี่เพื่อดาวน์โหลดไฟล์</a>";
+} else {
+    // ไม่มีสิทธิ์ หรือออเดอร์ยังไม่อนุมัติ: บล็อกการเข้าถึง
+    echo "<h3 style='color: red;'>คุณยังไม่มีสิทธิ์ดาวน์โหลด E-Book เล่มนี้</h3>";
+    echo "<p>โปรดตรวจสอบว่าท่านได้สั่งซื้อสินค้าแล้ว หรือรอผู้ดูแลระบบยืนยันการชำระเงิน</p>";
+}
+?>

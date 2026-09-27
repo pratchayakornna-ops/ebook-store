@@ -1,0 +1,209 @@
+/* assets/style.css - NEXTREAD Dynamic Animations & 3D Depth System */
+
+@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #6366f1;
+    --primary-glow: rgba(99, 102, 241, 0.35);
+    --accent: #10b981;
+    --bg-dark: #0b0f19;
+    --glass-bg: rgba(17, 24, 39, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+    font-family: 'Prompt', sans-serif;
+    background-color: var(--bg-dark);
+    color: #f1f5f9;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background Ambient Orbs for 3D Atmospheric Depth */
+.bg-ambient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.ambient-orb-1 {
+    position: absolute;
+    top: -10%;
+    left: 15%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+    border-radius: 50%;
+    filter: blur(60px);
+    animation: orbFloat1 18s ease-in-out infinite alternate;
+}
+
+.ambient-orb-2 {
+    position: absolute;
+    bottom: 5%;
+    right: 10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, rgba(168, 85, 247, 0) 70%);
+    border-radius: 50%;
+    filter: blur(70px);
+    animation: orbFloat2 22s ease-in-out infinite alternate;
+}
+
+.ambient-orb-3 {
+    position: absolute;
+    top: 40%;
+    left: 60%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0) 70%);
+    border-radius: 50%;
+    filter: blur(50px);
+    animation: orbFloat3 20s ease-in-out infinite alternate;
+}
+
+@keyframes orbFloat1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 80px) scale(1.15); }
+}
+
+@keyframes orbFloat2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-80px, -60px) scale(1.2); }
+}
+
+@keyframes orbFloat3 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-50px, 60px) scale(0.9); }
+}
+
+/* Page Container & Layout */
+.page-container {
+    position: relative;
+    z-index: 10;
+}
+
+/* Top Dynamic Progress Bar for Page Navigation */
+#page-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, #6366f1, #a855f7, #10b981);
+    z-index: 99999;
+    transition: width 0.3s ease, opacity 0.4s ease;
+    box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+    pointer-events: none;
+}
+
+/* Premium Glassmorphism Card with Depth & Hover Motion */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.35s ease;
+}
+
+.glass-nav {
+    background: rgba(11, 15, 25, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* Dynamic Card Motion on Hover */
+.interactive-card {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.3s ease;
+}
+
+.interactive-card:hover {
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5), 0 0 25px rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.4);
+}
+
+/* Book Cover 3D Illusion on Hover */
+.book-cover-3d {
+    perspective: 800px;
+    transform-style: preserve-3d;
+}
+
+.book-cover-3d img {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+}
+
+.book-cover-3d:hover img {
+    transform: scale(1.05) rotateY(-4deg) rotateX(2deg);
+    filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.6));
+}
+
+/* Staggered Content Fade-In Animations */
+@keyframes staggerFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stagger-item {
+    animation: staggerFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Interactive Buttons Micro-motion */
+button, .btn-action, a.rounded-xl {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+button:active, .btn-action:active, a.rounded-xl:active {
+    transform: scale(0.96);
+}
+
+/* Nav Active Indicator Gradient */
+.nav-item-active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.1));
+    border-left: 4px solid #6366f1;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.15);
+}
+
+/* Subtle Shimmer for Highlighting Special Elements */
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.shimmer-badge {
+    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(99, 102, 241, 0.2) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+::-webkit-scrollbar-track {
+    background: #0b0f19;
+}
+::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
