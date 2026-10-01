@@ -30,11 +30,22 @@ $columns = [];
 $rows = [];
 
 // จัดการการรัน Query
-if (!empty($sql_query) && isset($conn)) {
+$original_query = $sql_query;
+$query_to_run = $sql_query;
+$suggestion_msg = '';
+
+// ตรวจจับกรณีผู้ใช้พิมพ์ชื่อตาราง e-book, ebook หรือ books แทนที่จะเป็น ebooks
+if (preg_match('/\b(FROM|JOIN|INTO|UPDATE)\s+[`]?e-book[`]?\b/i', $query_to_run) || 
+    preg_match('/\b(FROM|JOIN|INTO|UPDATE)\s+[`]?ebook[`]?\b/i', $query_to_run) ||
+    preg_match('/\b(FROM|JOIN|INTO|UPDATE)\s+[`]?books[`]?\b/i', $query_to_run)) {
+    $query_to_run = preg_replace('/\b(FROM|JOIN|INTO|UPDATE)\s+[`]?(?:e-book|ebook|books)[`]?\b/i', '$1 ebooks', $query_to_run);
+    $suggestion_msg = 'หมายเหตุ: ในฐานข้อมูลตารางชื่อ "ebooks" (ระบบได้ปรับชื่อตารางให้คุณอัตโนมัติแล้ว)';
+}
+
+if (!empty($query_to_run) && isset($conn)) {
     $start_time = microtime(true);
     try {
-        // ใช้ multi_query หรือ query
-        $res = $conn->query($sql_query);
+        $res = $conn->query($query_to_run);
         $execution_time = round((microtime(true) - $start_time) * 1000, 2);
 
         if ($res === false) {
@@ -154,6 +165,42 @@ try {
                     </button>
                 </div>
             </div>
+
+            <!-- QUICK TABLE EXPLORER PILLS -->
+            <div class="p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex flex-wrap items-center gap-2 text-xs">
+                <span class="text-slate-400 font-semibold flex items-center gap-1.5 mr-1">
+                    <i class="fa-solid fa-table text-indigo-400"></i> คลิกดูข้อมูลในตารางโดยตรง:
+                </span>
+                <button type="button" onclick="queryTable('ebooks')" class="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 transition flex items-center gap-1">
+                    <i class="fa-solid fa-book"></i> ebooks (หนังสือ E-Book)
+                </button>
+                <button type="button" onclick="queryTable('orders')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    orders (คำสั่งซื้อ)
+                </button>
+                <button type="button" onclick="queryTable('order_items')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    order_items (รายการในออเดอร์)
+                </button>
+                <button type="button" onclick="queryTable('users')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    users (ผู้ใช้งาน)
+                </button>
+                <button type="button" onclick="queryTable('categories')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    categories (หมวดหมู่)
+                </button>
+                <button type="button" onclick="queryTable('authors')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    authors (นักเขียน)
+                </button>
+                <button type="button" onclick="queryTable('payments')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+                    payments (สลิปชำระเงิน)
+                </button>
+            </div>
+
+            <!-- SUGGESTION BANNER IF AUTOCORRECTED -->
+            <?php if (!empty($suggestion_msg)): ?>
+                <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-400"></i>
+                    <span><?php echo htmlspecialchars($suggestion_msg); ?></span>
+                </div>
+            <?php endif; ?>
 
             <!-- SQL EDITOR FORM -->
             <div class="glass-card rounded-3xl p-6 border border-slate-800/80 shadow-2xl">
@@ -392,6 +439,11 @@ ORDER BY u.user_id ASC;`
                 document.getElementById('sql_query').value = queryPresets[id];
                 document.getElementById('sqlForm').submit();
             }
+        }
+
+        function queryTable(tableName) {
+            document.getElementById('sql_query').value = `SELECT * FROM ${tableName} LIMIT 50;`;
+            document.getElementById('sqlForm').submit();
         }
 
         function clearQuery() {
