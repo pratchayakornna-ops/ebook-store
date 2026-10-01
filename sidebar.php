@@ -61,6 +61,12 @@ if (isset($conn)) {
                 <i class="fa-solid fa-plus-circle text-sm w-4 text-center <?php echo ($current_page == 'add_book') ? 'text-indigo-400' : ''; ?>"></i>
                 <span>เพิ่มหนังสือใหม่</span>
             </a>
+
+            <!-- 5. SQL Query Console & Analytics -->
+            <a href="admin_sql.php" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition <?php echo ($current_page == 'sql') ? 'nav-item-active font-semibold text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'; ?>">
+                <i class="fa-solid fa-terminal text-sm w-4 text-center <?php echo ($current_page == 'sql') ? 'text-indigo-400' : ''; ?>"></i>
+                <span>SQL Console & รายงาน</span>
+            </a>
         </nav>
     </div>
 
