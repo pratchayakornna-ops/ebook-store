@@ -414,8 +414,7 @@ LIMIT 30;`,
     a.author_name,
     c.category_name,
     e.price,
-    e.is_active,
-    e.created_at
+    e.is_active
 FROM ebooks e
 LEFT JOIN authors a ON e.author_id = a.author_id
 LEFT JOIN categories c ON e.category_id = c.category_id
@@ -428,7 +427,6 @@ ORDER BY e.ebook_id ASC;`,
     u.name,
     u.email,
     u.role,
-    u.created_at,
     (SELECT COUNT(*) FROM orders WHERE user_id = u.user_id) AS order_count
 FROM users u
 ORDER BY u.user_id ASC;`
