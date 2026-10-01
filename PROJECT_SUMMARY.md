@@ -12,45 +12,49 @@
 
 ```mermaid
 flowchart TB
-    subgraph ClientLayer["ส่วนหน้าบ้าน (Customer Frontend)"]
-        User["ผู้ใช้งานทั่วไป / ลูกค้า"]
-        Auth["ระบบยืนยันตัวตน (login.php / register.php)"]
-        Catalog["ค้นหาและคัดกรอง E-Book (index.php / book_detail.php)"]
-        Cart["ตะกร้าสินค้า (cart.php)"]
-        Checkout["ชำระเงินจำลองและแนบสลิป (checkout.php)"]
-        Orders["ประวัติคำสั่งซื้อ (orders.php)"]
-        Shelf["ชั้นหนังสือของฉัน (my_books.php)"]
-        Reader["โปรแกรมอ่าน E-Book (read.php)"]
+    subgraph ClientLayer["ส่วนหน้าบ้าน Customer Frontend"]
+        User["ผู้ใช้งานทั่วไป หรือ ลูกค้า"]
+        Auth["ระบบยืนยันตัวตน login และ register"]
+        Catalog["ค้นหาและดูรายละเอียด E-Book"]
+        Cart["ตะกร้าสินค้า cart.php"]
+        Checkout["ชำระเงินจำลองและแนบสลิป"]
+        Orders["ประวัติคำสั่งซื้อ orders.php"]
+        Shelf["ชั้นหนังสือของฉัน my_books.php"]
+        Reader["โปรแกรมอ่าน E-Book read.php"]
     end
 
-    subgraph AdminLayer["ส่วนหลังบ้าน (Admin Dashboard & Tools)"]
-        Admin["ผู้ดูแลระบบ (Role: admin)"]
-        Dash["แดชบอร์ดภาพรวม (admin_dashboard.php)"]
-        ManageBooks["จัดการ E-Book (admin_books.php / add_book.php / edit_book.php)"]
-        ManageOrders["ตรวจสอบสลิปและอนุมัติออเดอร์ (admin_orders.php)"]
-        SQLConsole["SQL Query Console & Analytics (admin_sql.php)"]
+    subgraph AdminLayer["ส่วนหลังบ้าน Admin Dashboard"]
+        Admin["ผู้ดูแลระบบ Admin"]
+        Dash["แดชบอร์ดภาพรวม admin_dashboard.php"]
+        ManageBooks["จัดการหนังสือ E-Book"]
+        ManageOrders["ตรวจสอบสลิปและอนุมัติออเดอร์"]
+        SQLConsole["SQL Query Console และ Analytics"]
     end
 
-    subgraph DBLayer["ฐานข้อมูลและไฟล์ (Database & Storage)"]
-        MySQL[("MySQL Database (10 Tables)")]
-        Uploads["โฟลเดอร์ uploads (covers, slips, pdfs)"]
+    subgraph DBLayer["ฐานข้อมูลและพื้นที่จัดเก็บไฟล์"]
+        MySQL[("MySQL Database 10 ตาราง")]
+        Uploads["โฟลเดอร์จัดเก็บไฟล์ uploads"]
     end
 
     User --> Auth
-    Auth --> Catalog --> Cart --> Checkout --> Orders
-    Orders -.->|เมื่อสถานะอนุมัติ| Shelf --> Reader
-    
+    Auth --> Catalog
+    Catalog --> Cart
+    Cart --> Checkout
+    Checkout --> Orders
+    Orders -->|เมื่อสถานะอนุมัติ| Shelf
+    Shelf --> Reader
+
     Admin --> Dash
     Dash --> ManageBooks
     Dash --> ManageOrders
     Dash --> SQLConsole
-    
+
     ManageOrders -->|อนุมัติคำสั่งซื้อ| Orders
-    ManageBooks <--> MySQL
-    ManageOrders <--> MySQL
-    SQLConsole <--> MySQL
+    ManageBooks --> MySQL
+    ManageOrders --> MySQL
+    SQLConsole --> MySQL
     Checkout --> Uploads
-    Reader <-- Uploads
+    Uploads --> Reader
 ```
 
 ---
