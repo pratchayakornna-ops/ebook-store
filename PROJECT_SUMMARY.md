@@ -12,45 +12,45 @@
 
 ```mermaid
 flowchart TB
-    subgraph ClientLayer["🌐 ส่วนหน้าบ้าน (Customer Frontend)"]
+    subgraph ClientLayer["ส่วนหน้าบ้าน (Customer Frontend)"]
         User["ผู้ใช้งานทั่วไป / ลูกค้า"]
         Auth["ระบบยืนยันตัวตน (login.php / register.php)"]
         Catalog["ค้นหาและคัดกรอง E-Book (index.php / book_detail.php)"]
         Cart["ตะกร้าสินค้า (cart.php)"]
-        Checkout["ชำระเงินจำลอง & แนบสลิป (checkout.php)"]
+        Checkout["ชำระเงินจำลองและแนบสลิป (checkout.php)"]
         Orders["ประวัติคำสั่งซื้อ (orders.php)"]
         Shelf["ชั้นหนังสือของฉัน (my_books.php)"]
         Reader["โปรแกรมอ่าน E-Book (read.php)"]
     end
 
-    subgraph AdminLayer["🛡️ ส่วนหลังบ้าน (Admin Dashboard & Tools)"]
-        Admin["ผู้ดูแลระบบ (Role = admin)"]
+    subgraph AdminLayer["ส่วนหลังบ้าน (Admin Dashboard & Tools)"]
+        Admin["ผู้ดูแลระบบ (Role: admin)"]
         Dash["แดชบอร์ดภาพรวม (admin_dashboard.php)"]
         ManageBooks["จัดการ E-Book (admin_books.php / add_book.php / edit_book.php)"]
-        ManageOrders["ตรวจสอบสลิป & อนุมัติออเดอร์ (admin_orders.php)"]
+        ManageOrders["ตรวจสอบสลิปและอนุมัติออเดอร์ (admin_orders.php)"]
         SQLConsole["SQL Query Console & Analytics (admin_sql.php)"]
     end
 
-    subgraph DBLayer["🗄️ ฐานข้อมูลและไฟล์ (Database & Storage)"]
+    subgraph DBLayer["ฐานข้อมูลและไฟล์ (Database & Storage)"]
         MySQL[("MySQL Database (10 Tables)")]
-        Uploads["โฟลเดอร์ uploads/ (covers, slips, pdfs)"]
+        Uploads["โฟลเดอร์ uploads (covers, slips, pdfs)"]
     end
 
     User --> Auth
     Auth --> Catalog --> Cart --> Checkout --> Orders
-    Orders -.->|เมื่อได้รับการอนุมัติ| Shelf --> Reader
+    Orders -.->|เมื่อสถานะอนุมัติ| Shelf --> Reader
     
     Admin --> Dash
     Dash --> ManageBooks
     Dash --> ManageOrders
     Dash --> SQLConsole
     
-    ManageOrders ==>|อนุมัติคำสั่งซื้อ (status='approved')| Orders
-    ManageBooks <==> MySQL
-    ManageOrders <==> MySQL
-    SQLConsole <==> MySQL
-    Checkout ==> Uploads
-    Reader <== Uploads
+    ManageOrders -->|อนุมัติคำสั่งซื้อ| Orders
+    ManageBooks <--> MySQL
+    ManageOrders <--> MySQL
+    SQLConsole <--> MySQL
+    Checkout --> Uploads
+    Reader <-- Uploads
 ```
 
 ---
@@ -170,22 +170,22 @@ erDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Customer as 👤 ลูกค้า
+    actor Customer as ลูกค้า
     participant Cart as ตะกร้าสินค้า (cart.php)
     participant Checkout as เช็คเอาท์ (checkout.php)
-    participant Admin as 🛡️ แอดมิน (admin_orders.php)
-    participant Shelf as 📚 ชั้นหนังสือ (my_books.php)
-    participant DB as 🗄️ MySQL Database
+    participant Admin as แอดมิน (admin_orders.php)
+    participant Shelf as ชั้นหนังสือ (my_books.php)
+    participant DB as ฐานข้อมูล MySQL
 
     Customer->>Cart: เพิ่มหนังสือลงตะกร้า
-    Customer->>Checkout: ไปหน้าชำระเงิน พร้อมอัปโหลดสลิป
-    Checkout->>DB: บันทึก orders (status='pending') & บันทึก payments
+    Customer->>Checkout: ไปหน้าชำระเงิน พร้อมแนบสลิป
+    Checkout->>DB: บันทึก orders สถานะ pending และบันทึก payments
     DB-->>Customer: แสดงหน้าสำเร็จ พร้อมหมายเลขคำสั่งซื้อ
-    Admin->>DB: ตรวจสอบรายการคำสั่งซื้อรออนุมัติ & สลิปหลักฐาน
-    Admin->>DB: กด "อนุมัติคำสั่งซื้อ" (UPDATE status='approved')
-    Customer->>Shelf: เข้าหน้า "ชั้นหนังสือของฉัน"
-    Shelf->>DB: Query เฉพาะหนังสือในคำสั่งซื้อที่ status='approved' ของ user_id ปัจจุบัน
-    DB-->>Customer: แสดงรายการหนังสือและปุ่ม "เปิดอ่าน E-Book" ทันที
+    Admin->>DB: ตรวจสอบรายการคำสั่งซื้อรออนุมัติและสลิป
+    Admin->>DB: กดอนุมัติคำสั่งซื้อ อัปเดตสถานะเป็น approved
+    Customer->>Shelf: เข้าหน้าชั้นหนังสือของฉัน
+    Shelf->>DB: ดึงเฉพาะหนังสือในคำสั่งซื้อที่อนุมัติแล้วของ user_id ปัจจุบัน
+    DB-->>Customer: แสดงรายการหนังสือและปุ่มเปิดอ่าน E-Book ทันที
 ```
 
 ### 3.2 การควบคุมสิทธิ์การเปิดอ่านหนังสือ (Security & Reader Flow)
@@ -193,21 +193,21 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as 👤 ผู้ใช้งาน
+    actor User as ผู้ใช้งาน
     participant Reader as โปรแกรมอ่าน (read.php)
-    participant DB as 🗄️ MySQL Database
+    participant DB as ฐานข้อมูล MySQL
 
     User->>Reader: ขอเข้าอ่านหนังสือ (read.php?id=X)
-    alt เป็นผู้ดูแลระบบ (isAdmin() == true)
+    alt เป็นผู้ดูแลระบบ (Admin)
         Reader-->>User: อนุญาตให้เปิดอ่านได้ทันที
     else เป็นลูกค้าทั่วไป
-        Reader->>DB: ตรวจสอบสิทธิ์ว่า user_id นี้ ซื้อ ebook_id นี้ และได้รับอนุมัติแล้วหรือไม่
+        Reader->>DB: ตรวจสอบสิทธิ์ว่าผู้ใช้นี้ซื้อและได้รับอนุมัติแล้วหรือไม่
         alt ไม่มีสิทธิ์ครอบครอง
             DB-->>Reader: ไม่พบประวัติการซื้อที่อนุมัติ
-            Reader-->>User: แจ้งเตือน "ไม่มีสิทธิ์เข้าถึง" และดีดกลับหน้าร้าน
+            Reader-->>User: แจ้งเตือนไม่มีสิทธิ์เข้าถึง และส่งกลับหน้าร้าน
         else มีสิทธิ์ถูกต้อง
             DB-->>Reader: ยืนยันสิทธิ์ความเป็นเจ้าของ
-            Reader-->>User: แสดงหน้าต่าง E-Book Reader เต็มรูปแบบ
+            Reader-->>User: แสดงหน้าต่างโปรแกรมอ่าน E-Book เต็มรูปแบบ
         end
     end
 ```
